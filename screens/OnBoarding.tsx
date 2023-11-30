@@ -15,6 +15,8 @@ import { APP_COLORS } from "../constants/colors";
 import { Spacer, SPACE_SIZE } from "../components/GeneralComponents";
 import { useState } from "react";
 import { validateEmail } from "../utils/validations";
+import { NavigationProp } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const TopImage = () => {
   const location = "../assets/images/customer-smile.jpg";
@@ -24,7 +26,17 @@ const TopImage = () => {
   );
 };
 
-const Form = () => {
+type RootStackParamList = {
+  OnBoarding: undefined;
+  Profile: undefined;
+  Home: undefined;
+};
+
+type OnBoardingProps = {
+  navigation: NavigationProp<RootStackParamList, "OnBoarding">;
+};
+
+export const Form: React.FC<OnBoardingProps> = ({ navigation }) => {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [isFormValid, setFormIsValid] = useState(false);
@@ -42,6 +54,26 @@ const Form = () => {
   const onEmailChange = (email: string) => {
     setEmail(email);
     validateForm(firstName, email);
+  };
+
+  const onNextPress = () => {
+    console.log("Next Pressed");
+    saveOnPrefs();
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Home" }],
+    });
+  };
+
+  const saveOnPrefs = async () => {
+    try {
+      await AsyncStorage.setItem("name", firstName);
+      await AsyncStorage.setItem("email", email);
+      await AsyncStorage.setItem("isOnBoardingComplete", "true");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const buttonStyle = isFormValid
@@ -74,7 +106,7 @@ const Form = () => {
       <Spacer />
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity disabled={!isFormValid}>
+        <TouchableOpacity disabled={!isFormValid} onPress={onNextPress}>
           <View style={[styles.button, buttonStyle]}>
             <Text style={styles.buttonText}>Next</Text>
           </View>
@@ -84,7 +116,7 @@ const Form = () => {
   );
 };
 
-export default function OnBoarding() {
+export const OnBoarding: React.FC<OnBoardingProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Header />
@@ -94,7 +126,7 @@ export default function OnBoarding() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <TopImage />
-          <Form />
+          <Form navigation={navigation} />
         </ScrollView>
         {/* This spacer push the textField Selected a little more to the top */}
         <Spacer factor={0.1} />
@@ -102,7 +134,7 @@ export default function OnBoarding() {
       <Footer />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
