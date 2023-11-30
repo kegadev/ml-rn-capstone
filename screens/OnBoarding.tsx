@@ -6,6 +6,8 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -23,7 +25,8 @@ const TopImage = () => {
 export default function OnBoarding() {
   const MainContent = () => {
     return (
-      <View style={styles.mainContent}>
+      <ScrollView keyboardDismissMode={"on-drag"} style={styles.mainContent}>
+        <Spacer />
         <Text style={styles.welcomeText}>Let us get to know you</Text>
         <Spacer factor={0.5} />
         <Text style={styles.labelText}>First Name</Text>
@@ -39,18 +42,22 @@ export default function OnBoarding() {
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     );
   };
 
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <TopImage />
-        <Spacer />
-        <MainContent />
-      </ScrollView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <TopImage />
+          <MainContent />
+        </ScrollView>
+      </KeyboardAvoidingView>
       <Footer />
     </View>
   );
@@ -80,10 +87,10 @@ const styles = StyleSheet.create({
     color: APP_COLORS.highlight_light,
   },
   labelText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "left",
     left: 8,
+    fontSize: 16,
+    textAlign: "left",
+    fontWeight: "bold",
     color: APP_COLORS.highlight_light,
   },
   textInput: {
