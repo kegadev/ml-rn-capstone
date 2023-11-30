@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <View style={styles.footerContainer}>
       <Text style={styles.footerText}>
-        Little Lemon by <Text style={styles.footerTextBold}>@kegadev</Text>2023
+        Little Lemon by <Text style={styles.footerTextBold}>@kegadev</Text> 2023
       </Text>
     </View>
   );
