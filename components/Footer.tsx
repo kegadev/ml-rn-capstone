@@ -13,11 +13,10 @@ export default function Footer() {
 
 const styles = StyleSheet.create({
   footerContainer: {
-    minWidth: "100%",
-    flexDirection: "row",
     paddingTop: 10,
-
+    minWidth: "100%",
     paddingBottom: 25,
+    flexDirection: "row",
     justifyContent: "center",
     backgroundColor: APP_COLORS.primary_yellow,
   },
