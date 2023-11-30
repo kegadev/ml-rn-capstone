@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import OnBoarding from "./screens/OnBoarding";
 import { APP_COLORS } from "./constants/colors";
 
