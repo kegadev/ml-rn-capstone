@@ -96,6 +96,8 @@ export default function OnBoarding() {
           <TopImage />
           <Form />
         </ScrollView>
+        {/* This spacer push the textField Selected a little more to the top */}
+        <Spacer factor={0.1} />
       </KeyboardAvoidingView>
       <Footer />
     </View>
@@ -158,7 +160,7 @@ const styles = StyleSheet.create({
     backgroundColor: APP_COLORS.primary_yellow,
   },
   buttonDisabled: {
-    backgroundColor: APP_COLORS.highlight_dark,
+    backgroundColor: APP_COLORS.primary_yellow_transparent,
   },
   buttonText: {
     fontSize: 16,
