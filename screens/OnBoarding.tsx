@@ -56,10 +56,7 @@ export const Form: React.FC<OnBoardingProps> = ({ navigation }) => {
     validateForm(firstName, email);
   };
 
-  const onNextPress = () => {
-    console.log("Next Pressed");
-    saveOnPrefs();
-
+  const goToHome = () => {
     navigation.reset({
       index: 0,
       routes: [{ name: "Home" }],
@@ -68,12 +65,17 @@ export const Form: React.FC<OnBoardingProps> = ({ navigation }) => {
 
   const saveOnPrefs = async () => {
     try {
-      await AsyncStorage.setItem("name", firstName);
-      await AsyncStorage.setItem("email", email);
-      await AsyncStorage.setItem("isOnBoardingComplete", "true");
+      const prefs = {
+        name: firstName,
+        email: email,
+        isOnBoardingComplete: true,
+      };
+      await AsyncStorage.setItem("@prefs", JSON.stringify(prefs));
     } catch (error) {
       console.log(error);
     }
+
+    goToHome();
   };
 
   const buttonStyle = isFormValid
@@ -106,7 +108,7 @@ export const Form: React.FC<OnBoardingProps> = ({ navigation }) => {
       <Spacer />
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity disabled={!isFormValid} onPress={onNextPress}>
+        <TouchableOpacity disabled={!isFormValid} onPress={saveOnPrefs}>
           <View style={[styles.button, buttonStyle]}>
             <Text style={styles.buttonText}>Next</Text>
           </View>

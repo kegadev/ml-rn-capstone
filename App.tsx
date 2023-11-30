@@ -27,11 +27,17 @@ export default function App() {
 
       // Get Data from async storage.
       try {
-        const isOnBoarding = await AsyncStorage.getItem("isOnBoardingComplete");
-        console.log("isOnBoarding", isOnBoarding);
+        const prefs = await AsyncStorage.getItem("@prefs");
+        console.log(prefs);
+        let isOnBoarding = false;
+
+        if (prefs != null) {
+          isOnBoarding = JSON.parse(prefs).isOnBoardingComplete || false;
+        }
+
         setState({
           isLoading: false,
-          isOnBoardingComplete: isOnBoarding === "true",
+          isOnBoardingComplete: isOnBoarding,
         });
       } catch (error) {
         console.error(error);
