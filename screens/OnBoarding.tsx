@@ -13,6 +13,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { APP_COLORS } from "../constants/colors";
 import { Spacer, SPACE_SIZE } from "../components/GeneralComponents";
+import { useState } from "react";
+import { validateEmail } from "../utils/validations";
 
 const TopImage = () => {
   const location = "../assets/images/customer-smile.jpg";
@@ -22,30 +24,67 @@ const TopImage = () => {
   );
 };
 
-export default function OnBoarding() {
-  const MainContent = () => {
-    return (
-      <ScrollView keyboardDismissMode={"on-drag"} style={styles.mainContent}>
-        <Spacer />
-        <Text style={styles.welcomeText}>Let us get to know you</Text>
-        <Spacer factor={0.5} />
-        <Text style={styles.labelText}>First Name</Text>
-        <Spacer factor={0.2} />
-        <TextInput style={styles.textInput} />
-        <Spacer factor={0.5} />
-        <Text style={styles.labelText}>Last Name</Text>
-        <Spacer factor={0.2} />
-        <TextInput style={styles.textInput} />
-        <Spacer />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Next</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    );
+const Form = () => {
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [isFormValid, setFormIsValid] = useState(false);
+
+  const validateForm = (name: string, email: string) => {
+    const isFormValid = name.length > 0 && validateEmail(email);
+    setFormIsValid(isFormValid);
   };
 
+  const onNameChange = (name: string) => {
+    setFirstName(name);
+    validateForm(name, email);
+  };
+
+  const onEmailChange = (email: string) => {
+    setEmail(email);
+    validateForm(firstName, email);
+  };
+
+  const buttonStyle = isFormValid
+    ? styles.buttonEnabled
+    : styles.buttonDisabled;
+
+  return (
+    <ScrollView keyboardDismissMode={"on-drag"} style={styles.Form}>
+      <Spacer />
+      <Text style={styles.welcomeText}>Let us get to know you</Text>
+      <Spacer factor={0.5} />
+      <Text style={styles.labelText}>First Name</Text>
+      <Spacer factor={0.2} />
+      <TextInput
+        placeholder="Kevin"
+        value={firstName}
+        onChangeText={onNameChange}
+        style={styles.textInput}
+      />
+      <Spacer factor={0.5} />
+      <Text style={styles.labelText}>Email</Text>
+      <Spacer factor={0.2} />
+      <TextInput
+        value={email}
+        placeholder="kegadev@littlelemon.com"
+        keyboardType="email-address"
+        onChangeText={onEmailChange}
+        style={styles.textInput}
+      />
+      <Spacer />
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity disabled={!isFormValid}>
+          <View style={[styles.button, buttonStyle]}>
+            <Text style={styles.buttonText}>Next</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+};
+
+export default function OnBoarding() {
   return (
     <View style={styles.container}>
       <Header />
@@ -55,7 +94,7 @@ export default function OnBoarding() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <TopImage />
-          <MainContent />
+          <Form />
         </ScrollView>
       </KeyboardAvoidingView>
       <Footer />
@@ -73,7 +112,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
   },
-  mainContent: {
+  Form: {
     paddingHorizontal: SPACE_SIZE,
   },
   image: {
@@ -99,10 +138,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 8,
     fontWeight: "bold",
-    alignSelf: "center",
-    alignItems: "center",
     paddingHorizontal: 10,
-    justifyContent: "center",
     color: APP_COLORS.highlight_dark,
     backgroundColor: APP_COLORS.highlight_light,
   },
@@ -117,7 +153,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     color: APP_COLORS.highlight_dark,
+  },
+  buttonEnabled: {
     backgroundColor: APP_COLORS.primary_yellow,
+  },
+  buttonDisabled: {
+    backgroundColor: APP_COLORS.highlight_dark,
   },
   buttonText: {
     fontSize: 16,
