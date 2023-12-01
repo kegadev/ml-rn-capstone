@@ -1,10 +1,57 @@
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { APP_COLORS } from "../constants/colors";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { NavigationProp } from "@react-navigation/native";
+import { Avatar, AvatarSize } from "./Avatar";
 
-export default function Header() {
+const BackIcon = ({ navigation }: any) => {
+  return (
+    <TouchableOpacity onPress={() => navigation.goBack()}>
+      <Ionicons
+        style={{ marginLeft: 16 }}
+        name="md-arrow-back-circle"
+        size={32}
+        color={APP_COLORS.highlight_dark}
+      />
+    </TouchableOpacity>
+  );
+};
+
+const ImageLogo = () => {
+  return (
+    <View style={styles.imageContainer}>
+      <Image resizeMode="cover" source={require("../assets/images/logo.png")} />
+    </View>
+  );
+};
+
+type HeaderProps = {
+  showBackButton?: boolean;
+  showProfileButton?: boolean;
+  navigation: NavigationProp<any>;
+};
+
+export default function Header({
+  showBackButton = false,
+  showProfileButton = false,
+  navigation,
+}: HeaderProps) {
   return (
     <View style={styles.headerContainer}>
-      <Image source={require("../assets/images/logo.png")} />
+      {/* Back Button (LEFT) */}
+      <View style={styles.backButtonContainer}>
+        {showBackButton && <BackIcon navigation={navigation} />}
+      </View>
+
+      {/* Image Logo (CENTER) */}
+      <ImageLogo />
+
+      {/* Profile Image (RIGHT) */}
+      <View style={styles.profileImageContainer}>
+        {showProfileButton && (
+          <Avatar onPress={() => navigation.navigate("Profile")} />
+        )}
+      </View>
     </View>
   );
 }
@@ -16,7 +63,22 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingVertical: 16,
     flexDirection: "row",
-    justifyContent: "center",
     backgroundColor: APP_COLORS.highlight_light,
+  },
+  backButtonContainer: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  imageContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  profileImageContainer: {
+    flex: 1,
+    flexDirection: "row",
+    right: 16,
+    justifyContent: "flex-end",
   },
 });
