@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  TextInput,
+} from "react-native";
 import Header from "../components/Header";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -6,8 +14,52 @@ import { useEffect, useState } from "react";
 import { Avatar } from "../components/Avatar";
 import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
+import { APP_COLORS } from "../constants/colors";
+import { APP_STYLES } from "../styles/appStyles";
 
-export default function Home({ navigation }: any) {
+const BannerImage = () => {
+  return (
+    <View style={styles.bannerImageContainer}>
+      <Image
+        style={styles.bannerImage}
+        resizeMode="cover"
+        source={require("../assets/images/header.png")}
+      />
+    </View>
+  );
+};
+
+const SearchBar = () => {
+  return (
+    <View style={styles.searchBar}>
+      <TextInput
+        placeholder="Search for food..."
+        style={APP_STYLES.textInput}
+      ></TextInput>
+    </View>
+  );
+};
+
+const Banner = () => {
+  return (
+    <View style={styles.banner}>
+      <Text style={styles.bannerTitle}>Little Lemon</Text>
+      <View style={styles.bannerContent}>
+        <View style={styles.bannerInnerContent}>
+          <Text style={styles.bannerSubtitle}>Chicago</Text>
+          <Text style={styles.bannerDescription}>
+            We are a familiy owned Mediterranean restaurant, focused on
+            traditional recipes served with a modern twist.
+          </Text>
+        </View>
+        <BannerImage />
+      </View>
+      <SearchBar />
+    </View>
+  );
+};
+
+const Home = ({ navigation }: any) => {
   const [state, setState] = useState({
     name: "",
     lastName: "",
@@ -54,7 +106,6 @@ export default function Home({ navigation }: any) {
       };
 
       loadData();
-      console.log("detect focus");
     }, [])
   );
 
@@ -70,16 +121,79 @@ export default function Home({ navigation }: any) {
         }
         navigation={navigation}
       />
-      <Text>Home</Text>
+      <ScrollView keyboardDismissMode="on-drag" style={styles.scrollView}>
+        <Banner />
+      </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
+    // width: "100%",
+  },
+  scrollView: {
+    flex: 1,
+    width: "100%",
+    // alignItems: "flex-end",
+    // justifyContent: "flex-start",
     backgroundColor: "#fff",
+    // paddingHorizontal: 50,
+  },
+  banner: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    backgroundColor: APP_COLORS.primary_green,
+  },
+  bannerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  bannerInnerContent: {
+    width: "60%",
+    // top: 16,
+
+    flexDirection: "column",
+    // alignItems: "center",
+    justifyContent: "center",
+  },
+  bannerTitle: {
+    fontSize: 56,
+    textAlign: "left",
+    fontWeight: "600",
+    fontFamily: "Markazi",
+    color: APP_COLORS.primary_yellow,
+  },
+  bannerSubtitle: {
+    fontSize: 36,
+    fontWeight: "bold",
+    fontFamily: "Markazi",
+    color: APP_COLORS.highlight_light,
+  },
+  bannerDescription: {
+    fontSize: 18,
+    fontWeight: "600",
+    fontFamily: "Karla",
+    color: APP_COLORS.highlight_light,
+  },
+  bannerImageContainer: {
+    width: 128,
+    flexDirection: "column",
+    alignSelf: "flex-end",
+  },
+  bannerImage: {
+    height: 160,
+    width: 128,
+    borderRadius: 16,
+    justifyContent: "center",
+    backgroundColor: APP_COLORS.highlight_light,
+  },
+  searchBar: {
+    paddingTop: 16,
   },
 });
+
+export default Home;
