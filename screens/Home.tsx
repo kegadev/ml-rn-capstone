@@ -6,6 +6,7 @@ import {
   Image,
   ScrollView,
   TextInput,
+  FlatList,
 } from "react-native";
 import Header from "../components/Header";
 
@@ -16,6 +17,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
 import { APP_COLORS } from "../constants/colors";
 import { APP_STYLES } from "../styles/appStyles";
+import { Spacer } from "../components/GeneralComponents";
 
 const BannerImage = () => {
   return (
@@ -59,6 +61,41 @@ const Banner = () => {
   );
 };
 
+type MenuItemType = {
+  name: string;
+  price: number;
+  category: string;
+  description: string;
+  image: string;
+};
+
+// const MenuItem = (item: any) => {
+const MenuItem = (item: MenuItemType) => {
+  console.log(item);
+  // const { name, price, category, description, image } = item["item"];
+  // console.log("ITEM NAME:" + item.item.name);
+  return (
+    <View>
+      <View style={styles.itemContainer}>
+        <View style={styles.itemDescriptionContainer}>
+          <Text style={styles.itemName}>{item.name}</Text>
+          <Spacer factor={0.1} />
+          <Text style={styles.itemDescription}>{item.description}</Text>
+          <Spacer factor={0.2} />
+          <Text style={styles.itemPrice}>$ {item.price}</Text>
+        </View>
+
+        <Image
+          style={styles.itemImage}
+          resizeMode="cover"
+          source={{ uri: item.image }}
+        />
+      </View>
+      <View style={[APP_STYLES.divider, { marginHorizontal: 50 }]} />
+    </View>
+  );
+};
+
 const Home = ({ navigation }: any) => {
   const [state, setState] = useState({
     name: "",
@@ -73,6 +110,9 @@ const Home = ({ navigation }: any) => {
     newsletter: false,
     isOnBoardingComplete: false,
   });
+
+  // const [menu, setMenu] = useState([]:MenuItemType);
+  const [menu, setMenu] = useState<MenuItemType[]>([]);
 
   function asignDefaulValues(prefsJson: any = {}) {
     setState({
@@ -89,6 +129,37 @@ const Home = ({ navigation }: any) => {
       newsletter: prefsJson.newsletter || false,
     });
   }
+
+  useEffect(() => {
+    try {
+      const loadMenu = async () => {
+        const request = await fetch(
+          "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json"
+        );
+        const menuJson = await request.json();
+        console.log(menuJson.menu);
+        const menuWithImage = menuJson.menu.map((item: MenuItemType) => {
+          return {
+            ...item,
+            image: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
+          };
+        });
+        // const menuWithImage = menuJson.map((item: any) => {
+        //   return {
+        //     ...item,
+        //     image: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
+        //   };
+        // });
+        // console.log(menuWithImage);
+        menuWithImage.forEach((element: MenuItemType) => {
+          console.log(element.name);
+        });
+        setMenu(menuWithImage);
+      };
+
+      loadMenu();
+    } catch (error) {}
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -109,6 +180,12 @@ const Home = ({ navigation }: any) => {
     }, [])
   );
 
+  // const renderItem = ({ item }: any) => {
+  const renderItem = (item: MenuItemType) => {
+    console.log("actual item::::: " + item);
+    return MenuItem(item);
+  };
+
   return (
     <View style={styles.container}>
       <Header
@@ -123,6 +200,11 @@ const Home = ({ navigation }: any) => {
       />
       <ScrollView keyboardDismissMode="on-drag" style={styles.scrollView}>
         <Banner />
+        <FlatList
+          data={menu}
+          renderItem={({ item }: { item: MenuItemType }) => renderItem(item)}
+          // renderItem={({ item }) => <MenuItem item={item} />}
+        />
       </ScrollView>
     </View>
   );
@@ -193,6 +275,50 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     paddingTop: 16,
+  },
+  itemContainer: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+
+    // backgroundColor: APP_COLORS.highlight_light,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    // alignItems: "center",
+  },
+  itemDescriptionContainer: {
+    width: "60%",
+    flexDirection: "column",
+    // alignItems: "center",
+    justifyContent: "center",
+  },
+
+  itemName: {
+    fontSize: 24,
+    fontWeight: "bold",
+    fontFamily: "Markazi",
+    color: APP_COLORS.primary_green,
+  },
+  itemPrice: {
+    fontSize: 18,
+    fontWeight: "600",
+    fontFamily: "Karla",
+    topmargin: 10,
+    color: APP_COLORS.highlight_dark,
+  },
+  itemDescription: {
+    fontSize: 14,
+
+    fontWeight: "600",
+    fontFamily: "Karla",
+    color: APP_COLORS.highlight_dark,
+  },
+  itemImage: {
+    height: 100,
+    width: 100,
+    borderRadius: 8,
+    alignSelf: "center",
+    // alignSelf: "flex-end",
+    backgroundColor: APP_COLORS.highlight_light,
   },
 });
 
