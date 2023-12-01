@@ -58,8 +58,8 @@ export const Form: React.FC<OnBoardingProps> = ({ navigation }) => {
 
   const goToHome = () => {
     navigation.reset({
-      index: 0,
-      routes: [{ name: "Home" }],
+      index: 1,
+      routes: [{ name: "Home" }, { name: "Profile" }],
     });
   };
 
