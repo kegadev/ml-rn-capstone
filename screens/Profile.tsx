@@ -66,26 +66,25 @@ export default function Profile({ navigation }: any) {
   }, []);
 
   const saveOnPrefs = async () => {
-    console.log("SAVE ON PRFS");
-    console.log(state);
     if (
-      state.name === "" ||
-      state.lastName === "" ||
-      state.email === "" ||
-      state.phoneNumber === ""
+      state.name.trim() === "" ||
+      state.lastName.trim() === "" ||
+      state.email.trim() === "" ||
+      state.phoneNumber.trim() === ""
     ) {
-      alert("Please fill all the fields");
+      alert("Please fill all the text fields");
       return;
     } else if (!validateEmail(state.email)) {
       alert("Please enter a valid email");
       return;
     }
-
-    const isValidPhone = /^\d{10}$/.test(state.phoneNumber);
-    if (!isValidPhone) {
-      alert("Please enter a valid phone number");
-      return;
-    }
+    // else {
+    //   const isValidPhone = /^\d{10}$/.test(state.phoneNumber);
+    //   if (!isValidPhone) {
+    //     alert("Please enter a valid phone number");
+    //     return;
+    //   }
+    // }
 
     try {
       const newPrefs = {
@@ -105,6 +104,23 @@ export default function Profile({ navigation }: any) {
       console.log(prefsString);
       await AsyncStorage.mergeItem("@prefs", prefsString);
       alert("Changes saved");
+      navigation.goBack();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const logOut = async () => {
+    await deletePrefs();
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "OnBoarding" }],
+    });
+  };
+
+  const deletePrefs = async () => {
+    try {
+      await AsyncStorage.clear();
     } catch (error) {
       console.error(error);
     }
@@ -161,6 +177,7 @@ export default function Profile({ navigation }: any) {
             placeholder="kegadev@littlelemon.com"
             value={state.email}
             maxLength={50}
+            keyboardType="email-address"
             onChangeText={(value) => setState({ ...state, email: value })}
             style={styles.textInput}
           />
@@ -168,6 +185,7 @@ export default function Profile({ navigation }: any) {
           <TextInput
             placeholder="1234567890"
             maxLength={10}
+            keyboardType="phone-pad"
             value={state.phoneNumber}
             onChangeText={(value) => setState({ ...state, phoneNumber: value })}
             style={styles.textInput}
@@ -246,6 +264,7 @@ export default function Profile({ navigation }: any) {
           <View style={styles.divider} />
 
           <TouchableOpacity
+            onPress={logOut}
             style={[
               styles.button,
               { backgroundColor: APP_COLORS.highlight_light, width: "100%" },
