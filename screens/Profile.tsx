@@ -63,6 +63,42 @@ export default function Profile({ navigation }: any) {
 
     loadData();
   }, []);
+
+  const saveOnPrefs = async () => {
+    console.log("SAVE ON PRFS");
+    console.log(state);
+    if (
+      state.name === "" ||
+      state.lastName === "" ||
+      state.email === "" ||
+      state.phoneNumber === ""
+    ) {
+      alert("Please fill all the fields");
+      return;
+    }
+
+    try {
+      const newPrefs = {
+        name: state.name,
+        lastName: state.lastName,
+        email: state.email,
+        phoneNumber: state.phoneNumber,
+        orderStatus: state.orderStatus,
+        passwordChanges: state.passwordChanges,
+        specialOffers: state.specialOffers,
+        newsletter: state.newsletter,
+        isOnBoardingComplete: true,
+      };
+
+      const prefsString = JSON.stringify(newPrefs);
+      console.log("PREFS STRING");
+      console.log(prefsString);
+      await AsyncStorage.mergeItem("@prefs", prefsString);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Header showBackButton navigation={navigation} />
@@ -97,24 +133,28 @@ export default function Profile({ navigation }: any) {
           <TextInput
             placeholder="Kevin"
             value={state.name}
+            onChangeText={(value) => setState({ ...state, name: value })}
             style={styles.textInput}
           />
           <Text style={styles.textLabel}>Last name</Text>
           <TextInput
             placeholder="Garcia"
             value={state.lastName}
+            onChangeText={(value) => setState({ ...state, lastName: value })}
             style={styles.textInput}
           />
           <Text style={styles.textLabel}>Email</Text>
           <TextInput
             placeholder="kegadev@littlelemon.com"
             value={state.email}
+            onChangeText={(value) => setState({ ...state, email: value })}
             style={styles.textInput}
           />
           <Text style={styles.textLabel}>Phone number</Text>
           <TextInput
             placeholder="123 456 7890"
             value={state.phoneNumber}
+            onChangeText={(value) => setState({ ...state, phoneNumber: value })}
             style={styles.textInput}
           />
           <Spacer factor={0.4} />
@@ -177,6 +217,7 @@ export default function Profile({ navigation }: any) {
               <Text style={styles.buttonText}>Discard changes</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={saveOnPrefs}
               style={[
                 styles.button,
                 { backgroundColor: APP_COLORS.primary_yellow },
