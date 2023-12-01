@@ -15,6 +15,7 @@ import { APP_COLORS } from "../constants/colors";
 import { Spacer } from "../components/GeneralComponents";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
+import { validateEmail } from "../utils/validations";
 
 export default function Profile({ navigation }: any) {
   const [state, setState] = useState({
@@ -75,6 +76,15 @@ export default function Profile({ navigation }: any) {
     ) {
       alert("Please fill all the fields");
       return;
+    } else if (!validateEmail(state.email)) {
+      alert("Please enter a valid email");
+      return;
+    }
+
+    const isValidPhone = /^\d{10}$/.test(state.phoneNumber);
+    if (!isValidPhone) {
+      alert("Please enter a valid phone number");
+      return;
     }
 
     try {
@@ -94,6 +104,7 @@ export default function Profile({ navigation }: any) {
       console.log("PREFS STRING");
       console.log(prefsString);
       await AsyncStorage.mergeItem("@prefs", prefsString);
+      alert("Changes saved");
     } catch (error) {
       console.error(error);
     }
@@ -133,6 +144,7 @@ export default function Profile({ navigation }: any) {
           <TextInput
             placeholder="Kevin"
             value={state.name}
+            maxLength={50}
             onChangeText={(value) => setState({ ...state, name: value })}
             style={styles.textInput}
           />
@@ -140,6 +152,7 @@ export default function Profile({ navigation }: any) {
           <TextInput
             placeholder="Garcia"
             value={state.lastName}
+            maxLength={50}
             onChangeText={(value) => setState({ ...state, lastName: value })}
             style={styles.textInput}
           />
@@ -147,12 +160,14 @@ export default function Profile({ navigation }: any) {
           <TextInput
             placeholder="kegadev@littlelemon.com"
             value={state.email}
+            maxLength={50}
             onChangeText={(value) => setState({ ...state, email: value })}
             style={styles.textInput}
           />
           <Text style={styles.textLabel}>Phone number</Text>
           <TextInput
-            placeholder="123 456 7890"
+            placeholder="1234567890"
+            maxLength={10}
             value={state.phoneNumber}
             onChangeText={(value) => setState({ ...state, phoneNumber: value })}
             style={styles.textInput}
