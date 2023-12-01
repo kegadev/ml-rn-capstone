@@ -26,7 +26,7 @@ const db = SQLite.openDatabase("little_lemon");
 
 export async function createTable() {
   return new Promise<void>((resolve, reject) => {
-    console.log("createTable");
+    // console.log("createTable");
 
     db.transaction(
       (tx) => {
@@ -46,11 +46,23 @@ export async function getMenuItems() {
   return new Promise((resolve) => {
     db.transaction((tx) => {
       let query = "select * from menuitems";
-      console.log("query", query);
+      //   console.log("query", query);
       tx.executeSql(query, [], (_, { rows }) => {
         resolve(rows._array);
       });
     });
+  });
+}
+
+export async function dropTable() {
+  return new Promise<void>((resolve, reject) => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql("DROP TABLE IF EXISTS menuitems;");
+      },
+      reject,
+      () => resolve()
+    );
   });
 }
 
@@ -73,7 +85,7 @@ export function saveMenuItems(menuItems: MenuItemType[]) {
       (tx) => {
         menuItems.forEach((element) => {
           tx.executeSql(
-            "INSERT INTO menuitems (uuid,name,price,description,category, image) VALUES (?,?,?,?,?,?)",
+            "INSERT INTO menuitems (uuid,name,price,description,category,image) VALUES (?,?,?,?,?,?)",
             [
               element.name,
               element.name,
@@ -152,14 +164,14 @@ export async function filterByQueryAndCategories(
           });
           queryStr += ")";
         }
+        console.log("query", queryStr);
         tx.executeSql(queryStr, [], (_, { rows }) => {
           resolve(rows._array);
         });
       },
       reject
-      //   ()=>resolve()
+      //   () => resolve([])
+      //   () => resolve() // Wrap resolve in another function
     );
-
-    // resolve(SECTION_LIST_MOCK_DATA);
   });
 }

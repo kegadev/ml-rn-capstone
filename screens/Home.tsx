@@ -21,6 +21,8 @@ import { Spacer } from "../components/GeneralComponents";
 import { MenuItemType } from "../types/types";
 import {
   createTable,
+  dropTable,
+  filterByQueryAndCategories,
   getMenuItems,
   saveMenuItems,
   truncateTable,
@@ -29,79 +31,6 @@ import {
 import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabase("little_lemon");
-
-const BannerImage = () => {
-  return (
-    <View style={styles.bannerImageContainer}>
-      <Image
-        style={styles.bannerImage}
-        resizeMode="cover"
-        source={require("../assets/images/header.png")}
-      />
-    </View>
-  );
-};
-
-const SearchBar = () => {
-  return (
-    <View style={styles.searchBar}>
-      <TextInput
-        placeholder="Search for food..."
-        style={APP_STYLES.textInput}
-      ></TextInput>
-    </View>
-  );
-};
-
-const Banner = () => {
-  return (
-    <View style={styles.banner}>
-      <Text style={styles.bannerTitle}>Little Lemon</Text>
-      <View style={styles.bannerContent}>
-        <View style={styles.bannerInnerContent}>
-          <Text style={styles.bannerSubtitle}>Chicago</Text>
-          <Text style={styles.bannerDescription}>
-            We are a familiy owned Mediterranean restaurant, focused on
-            traditional recipes served with a modern twist.
-          </Text>
-        </View>
-        <BannerImage />
-      </View>
-      <SearchBar />
-    </View>
-  );
-};
-
-// const MenuItem = (item: any) => {
-const MenuItem = (item: MenuItemType) => {
-  console.log(item);
-  // const { name, price, category, description, image } = item["item"];
-  // console.log("ITEM NAME:" + item.item.name);
-  return (
-    <View>
-      <View style={styles.itemContainer}>
-        <View style={styles.itemDescriptionContainer}>
-          <Text style={styles.itemName}>
-            {item.name}{" "}
-            <Text style={styles.itemCategory}> - {item.category} -</Text>
-          </Text>
-          <Spacer factor={0.1} />
-          <Text style={styles.itemDescription}>{item.description}</Text>
-          <Spacer factor={0.2} />
-          <Text style={styles.itemPrice}>$ {item.price}</Text>
-        </View>
-
-        <Image
-          style={styles.itemImage}
-          resizeMode="cover"
-          source={{ uri: item.image }}
-        />
-      </View>
-      <View style={[APP_STYLES.divider, { marginHorizontal: 50 }]} />
-    </View>
-  );
-};
-
 const Home = ({ navigation }: any) => {
   const [state, setState] = useState({
     name: "",
@@ -120,6 +49,81 @@ const Home = ({ navigation }: any) => {
   // const [menu, setMenu] = useState([]:MenuItemType);
   const [menu, setMenu] = useState<MenuItemType[]>([]);
 
+  const [searchInput, setSearchInput] = useState("");
+  const BannerImage = () => {
+    return (
+      <View style={styles.bannerImageContainer}>
+        <Image
+          style={styles.bannerImage}
+          resizeMode="cover"
+          source={require("../assets/images/header.png")}
+        />
+      </View>
+    );
+  };
+
+  const SearchBar = () => {
+    return (
+      <View style={styles.searchBar}>
+        <TextInput
+          value={searchInput}
+          onChangeText={(text) => setSearchInput(text)}
+          placeholder="Search for food..."
+          style={APP_STYLES.textInput}
+        ></TextInput>
+      </View>
+    );
+  };
+
+  const Banner = () => {
+    return (
+      <View style={styles.banner}>
+        <Text style={styles.bannerTitle}>Little Lemon</Text>
+        <View style={styles.bannerContent}>
+          <View style={styles.bannerInnerContent}>
+            <Text style={styles.bannerSubtitle}>Chicago</Text>
+            <Text style={styles.bannerDescription}>
+              We are a familiy owned Mediterranean restaurant, focused on
+              traditional recipes served with a modern twist.
+            </Text>
+          </View>
+          <BannerImage />
+        </View>
+        <SearchBar />
+      </View>
+    );
+  };
+
+  // const MenuItem = (item: any) => {
+  const MenuItem = (item: MenuItemType) => {
+    // console.log(item);
+    // const { name, price, category, description, image } = item["item"];
+    // console.log("ITEM NAME:" + item.item.name);
+    return (
+      <View>
+        <View style={styles.itemContainer}>
+          <View style={styles.itemDescriptionContainer}>
+            <Text style={styles.itemName}>
+              {item.name}{" "}
+              <Text style={styles.itemCategory}> - {item.category} -</Text>
+            </Text>
+            <Spacer factor={0.1} />
+            <Text style={styles.itemDescription}>{item.description}</Text>
+            <Spacer factor={0.2} />
+            <Text style={styles.itemPrice}>$ {item.price}</Text>
+          </View>
+
+          <Image
+            style={styles.itemImage}
+            resizeMode="cover"
+            source={{ uri: item.image }}
+          />
+        </View>
+        <View style={[APP_STYLES.divider, { marginHorizontal: 50 }]} />
+      </View>
+    );
+  };
+
   // TODO: filter here
   const [categories, setCategories] = useState({
     starters: false,
@@ -128,17 +132,39 @@ const Home = ({ navigation }: any) => {
     drinks: false,
   });
 
+  useEffect(() => {
+    const filter = async () => {
+      const selectedCategories = getCategories();
+      const menuItems = await filterByQueryAndCategories(
+        searchInput,
+        selectedCategories
+      );
+      setMenu(menuItems as MenuItemType[]);
+    };
+    filter();
+  }, [categories, searchInput]);
+
   const getCategories = () => {
+    // return Object.keys(cats).filter(
+    //   (key) => categories[key as keyof typeof cats] === true
     return Object.keys(categories).filter(
       (key) => categories[key as keyof typeof categories] === true
     );
   };
 
-  const onCategoryPress = (category: string) => {
+  const onCategoryPress = async (category: string) => {
     const value = categories[category as keyof typeof categories];
-    setCategories({ ...categories, [category]: !value });
-    const selectedCategories = getCategories();
-    console.log(selectedCategories);
+    const newArray = { ...categories, [category]: !value };
+
+    setCategories(newArray);
+    // const selectedCategories = getCategories(newArray);
+    // const menuItems = await filterByQueryAndCategories(
+    //   searchInput,
+    //   selectedCategories
+    // );
+    // console.log("MENU ITEMS::::: ");
+    // console.log(menuItems);
+    // setMenu(menuItems as MenuItemType[]);
   };
 
   function asignDefaulValues(prefsJson: any = {}) {
@@ -229,6 +255,7 @@ const Home = ({ navigation }: any) => {
   };
 
   useEffect(() => {
+    // dropTable();
     // truncateTable();
     // return;
     try {
