@@ -17,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { validateEmail } from "../utils/validations";
 import { pickImage } from "../utils/pickImage";
+import { APP_STYLES } from "../styles/appStyles";
 
 export default function Profile({ navigation }: any) {
   const [state, setState] = useState({
@@ -218,7 +219,7 @@ export default function Profile({ navigation }: any) {
             value={state.name}
             maxLength={50}
             onChangeText={(value) => setState({ ...state, name: value })}
-            style={styles.textInput}
+            style={APP_STYLES.textInput}
           />
           <Text style={styles.textLabel}>Last name</Text>
           <TextInput
@@ -226,7 +227,7 @@ export default function Profile({ navigation }: any) {
             value={state.lastName}
             maxLength={50}
             onChangeText={(value) => setState({ ...state, lastName: value })}
-            style={styles.textInput}
+            style={APP_STYLES.textInput}
           />
           <Text style={styles.textLabel}>Email</Text>
           <TextInput
@@ -235,7 +236,7 @@ export default function Profile({ navigation }: any) {
             maxLength={50}
             keyboardType="email-address"
             onChangeText={(value) => setState({ ...state, email: value })}
-            style={styles.textInput}
+            style={APP_STYLES.textInput}
           />
           <Text style={styles.textLabel}>Phone number</Text>
           <TextInput
@@ -244,7 +245,7 @@ export default function Profile({ navigation }: any) {
             keyboardType="phone-pad"
             value={state.phoneNumber}
             onChangeText={(value) => setState({ ...state, phoneNumber: value })}
-            style={styles.textInput}
+            style={APP_STYLES.textInput}
           />
           <Spacer factor={0.4} />
           <Text style={styles.textCategory}>Email notifications</Text>
@@ -317,7 +318,7 @@ export default function Profile({ navigation }: any) {
           </View>
 
           <Spacer factor={0.5} />
-          <View style={styles.divider} />
+          <View style={APP_STYLES.divider} />
 
           <TouchableOpacity
             onPress={logOut}
@@ -369,18 +370,6 @@ const styles = StyleSheet.create({
     color: APP_COLORS.highlight_dark,
   },
 
-  textInput: {
-    flex: 1,
-    height: 40,
-    fontSize: 16,
-    borderRadius: 8,
-    marginBottom: 10,
-    flexDirection: "row",
-    paddingHorizontal: 10,
-    color: APP_COLORS.highlight_dark,
-    backgroundColor: APP_COLORS.highlight_light,
-  },
-
   checkBoxContainer: {
     flexDirection: "row",
     color: APP_COLORS.highlight_dark,
@@ -409,14 +398,5 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
     width: "100%",
-  },
-  divider: {
-    height: 2,
-    width: "100%",
-    borderRadius: 1,
-    alignSelf: "center",
-    paddingHorizontal: 10,
-    marginVertical: 20,
-    backgroundColor: APP_COLORS.highlight_light,
   },
 });
