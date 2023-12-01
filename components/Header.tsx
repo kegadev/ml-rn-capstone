@@ -27,14 +27,14 @@ const ImageLogo = () => {
 
 type HeaderProps = {
   showBackButton?: boolean;
-  showProfileButton?: boolean;
   navigation: NavigationProp<any>;
+  avatar?: any;
 };
 
 export default function Header({
   showBackButton = false,
-  showProfileButton = false,
   navigation,
+  avatar,
 }: HeaderProps) {
   return (
     <View style={styles.headerContainer}>
@@ -42,15 +42,13 @@ export default function Header({
       <View style={styles.backButtonContainer}>
         {showBackButton && <BackIcon navigation={navigation} />}
       </View>
-
       {/* Image Logo (CENTER) */}
       <ImageLogo />
 
       {/* Profile Image (RIGHT) */}
       <View style={styles.profileImageContainer}>
-        {showProfileButton && (
-          <Avatar onPress={() => navigation.navigate("Profile")} />
-        )}
+        {avatar}
+        {/* <Avatar onPress={() => navigation.navigate("Profile")} /> */}
       </View>
     </View>
   );

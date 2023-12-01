@@ -16,14 +16,17 @@ import { Spacer } from "../components/GeneralComponents";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { validateEmail } from "../utils/validations";
+import { pickImage } from "../utils/pickImage";
 
 export default function Profile({ navigation }: any) {
   const [state, setState] = useState({
     name: "",
     lastName: "",
+    image: "",
     email: "",
     phoneNumber: "",
     orderStatus: false,
+    avatarCharacters: "",
     passwordChanges: true,
     specialOffers: false,
     newsletter: false,
@@ -32,17 +35,18 @@ export default function Profile({ navigation }: any) {
   const [prefs, setPrefs] = useState({});
 
   function asignDefaulValues(prefsJson: any = {}) {
-    console.log(prefsJson);
     setState({
       ...state,
-      name: prefsJson.name,
-      lastName: prefsJson.lastName,
-      email: prefsJson.email,
-      phoneNumber: prefsJson.phoneNumber,
-      orderStatus: prefsJson.orderStatus,
-      passwordChanges: prefsJson.passwordChanges,
-      specialOffers: prefsJson.specialOffers,
-      newsletter: prefsJson.newsletter,
+      name: prefsJson.name || "",
+      image: prefsJson.image || "",
+      lastName: prefsJson.lastName || "",
+      email: prefsJson.email || "",
+      avatarCharacters: prefsJson.avatarCharacters || "",
+      phoneNumber: prefsJson.phoneNumber || "",
+      orderStatus: prefsJson.orderStatus || false,
+      passwordChanges: prefsJson.passwordChanges || false,
+      specialOffers: prefsJson.specialOffers || false,
+      newsletter: prefsJson.newsletter || false,
     });
   }
 
@@ -89,9 +93,11 @@ export default function Profile({ navigation }: any) {
       const newPrefs = {
         name: state.name,
         lastName: state.lastName,
+        image: state.image,
         email: state.email,
         phoneNumber: state.phoneNumber,
         orderStatus: state.orderStatus,
+        avatarCharacters: state.avatarCharacters,
         passwordChanges: state.passwordChanges,
         specialOffers: state.specialOffers,
         newsletter: state.newsletter,
@@ -125,6 +131,48 @@ export default function Profile({ navigation }: any) {
     }
   };
 
+  const onChangeImage = async () => {
+    const image = await pickImage();
+    console.log(image);
+    if (image) {
+      setState({ ...state, image: image, avatarCharacters: "" });
+    }
+  };
+
+  const getAvatarCharacters = () => {
+    if (
+      !state.name ||
+      !state.lastName ||
+      state.name?.trim() === "" ||
+      state.lastName?.trim() === ""
+    ) {
+      return "";
+    }
+
+    const name = state.name.trim().charAt(0).toUpperCase();
+    const lastName = state.lastName.trim().charAt(0).toUpperCase();
+
+    return name + lastName;
+  };
+
+  const onDefaultImage = () => {
+    setState({ ...state, image: "", avatarCharacters: "" });
+  };
+
+  const onRemoveImage = () => {
+    const chars = getAvatarCharacters();
+    if (chars === "") {
+      alert(
+        "Please fill the name and last name fields to assign a default avatar with your initials"
+      );
+    }
+    setState({
+      ...state,
+      image: "",
+      avatarCharacters: chars,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Header showBackButton navigation={navigation} />
@@ -140,18 +188,27 @@ export default function Profile({ navigation }: any) {
           <Text style={styles.textCategory}>Personal Information</Text>
           <Spacer factor={0.2} />
           <Text style={styles.textLabel}>Avatar</Text>
-
+          {/* <ImagePickerExample /> */}
           <View style={styles.avatarContainer}>
-            <Avatar avatarSize={AvatarSize.LARGE} />
+            <Avatar
+              onPress={onChangeImage}
+              avatarSize={AvatarSize.LARGE}
+              imageUrl={state.image}
+              text={state.avatarCharacters}
+            />
             <TouchableOpacity
+              onPress={onDefaultImage}
               style={[
                 styles.button,
                 { backgroundColor: APP_COLORS.highlight_light },
               ]}
             >
-              <Text style={styles.buttonText}>Change</Text>
+              <Text style={styles.buttonText}>Default</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.button, styles.buttonOutlined]}>
+            <TouchableOpacity
+              onPress={onRemoveImage}
+              style={[styles.button, styles.buttonOutlined]}
+            >
               <Text style={styles.buttonText}>Remove</Text>
             </TouchableOpacity>
           </View>
