@@ -1,9 +1,15 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import Header from "../components/Header";
+import { Avatar, AvatarSize } from "../components/Avatar";
 
-export default function Profile() {
+export default function Profile({ navigation }: any) {
   return (
     <View style={styles.container}>
-      <Text>Profile</Text>
+      <Header showBackButton navigation={navigation} />
+      <ScrollView>
+        <Text>Personal Information</Text>
+        <Avatar avatarSize={AvatarSize.LARGE} />
+      </ScrollView>
     </View>
   );
 }
@@ -11,8 +17,8 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+
+    alignItems: "flex-start",
     backgroundColor: "#fff",
   },
 });
