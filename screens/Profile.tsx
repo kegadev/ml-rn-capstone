@@ -22,7 +22,10 @@ export default function Profile({ navigation }: any) {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.mainContainer}
       >
-        <ScrollView keyboardDismissMode={"on-drag"}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardDismissMode={"on-drag"}
+        >
           <Spacer factor={0.5} />
           <Text style={styles.textCategory}>Personal Information</Text>
           <Spacer factor={0.2} />
