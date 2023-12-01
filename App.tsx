@@ -7,6 +7,7 @@ import Profile from "./screens/Profile";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import Splash from "./screens/Splash";
+import { useFonts } from "expo-font";
 import Home from "./screens/Home";
 
 const Stack = createNativeStackNavigator();
@@ -15,6 +16,11 @@ export default function App() {
   const [state, setState] = useState({
     isLoading: true,
     isOnBoardingComplete: false,
+  });
+
+  const [fontsLoaded] = useFonts({
+    Karla: require("./assets/fonts/Karla-Regular.ttf"),
+    Markazi: require("./assets/fonts/MarkaziText-Regular.ttf"),
   });
 
   useEffect(() => {
@@ -48,7 +54,7 @@ export default function App() {
   }, []);
 
   // Show Splash screen while loading the async storage data.
-  if (state.isLoading) return <Splash />;
+  if (state.isLoading || !fontsLoaded) return <Splash />;
 
   const initialRouteName = state.isOnBoardingComplete ? "Home" : "OnBoarding";
 
