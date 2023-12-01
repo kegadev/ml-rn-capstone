@@ -77,14 +77,13 @@ export default function Profile({ navigation }: any) {
     } else if (!validateEmail(state.email)) {
       alert("Please enter a valid email");
       return;
+    } else {
+      const isValidPhone = /^\d{10}$/.test(state.phoneNumber);
+      if (!isValidPhone) {
+        alert("Please enter a valid phone number");
+        return;
+      }
     }
-    // else {
-    //   const isValidPhone = /^\d{10}$/.test(state.phoneNumber);
-    //   if (!isValidPhone) {
-    //     alert("Please enter a valid phone number");
-    //     return;
-    //   }
-    // }
 
     try {
       const newPrefs = {
