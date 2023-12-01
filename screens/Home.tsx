@@ -18,6 +18,7 @@ import React from "react";
 import { APP_COLORS } from "../constants/colors";
 import { APP_STYLES } from "../styles/appStyles";
 import { Spacer } from "../components/GeneralComponents";
+import { MenuItemType } from "../types/types";
 
 const BannerImage = () => {
   return (
@@ -81,14 +82,6 @@ const Filter = () => {
       </View>
     </View>
   );
-};
-
-type MenuItemType = {
-  name: string;
-  price: number;
-  category: string;
-  description: string;
-  image: string;
 };
 
 // const MenuItem = (item: any) => {
@@ -224,6 +217,7 @@ const Home = ({ navigation }: any) => {
         <Banner />
         <Filter />
         <FlatList
+          keyExtractor={(item) => item.name + item.price}
           data={menu}
           renderItem={({ item }: { item: MenuItemType }) => renderItem(item)}
           // renderItem={({ item }) => <MenuItem item={item} />}
@@ -322,12 +316,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: APP_COLORS.highlight_light,
+    backgroundColor: APP_COLORS.primary_green,
   },
   filterButtonText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: APP_COLORS.primary_green,
+    color: APP_COLORS.highlight_light,
     // fontFamily: "karla",
   },
 
