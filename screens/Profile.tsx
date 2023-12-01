@@ -13,8 +13,56 @@ import Header from "../components/Header";
 import { Avatar, AvatarSize } from "../components/Avatar";
 import { APP_COLORS } from "../constants/colors";
 import { Spacer } from "../components/GeneralComponents";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
 
 export default function Profile({ navigation }: any) {
+  const [state, setState] = useState({
+    name: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    orderStatus: false,
+    passwordChanges: true,
+    specialOffers: false,
+    newsletter: false,
+    isOnBoardingComplete: false,
+  });
+  const [prefs, setPrefs] = useState({});
+
+  function asignDefaulValues(prefsJson: any = {}) {
+    console.log(prefsJson);
+    setState({
+      ...state,
+      name: prefsJson.name,
+      lastName: prefsJson.lastName,
+      email: prefsJson.email,
+      phoneNumber: prefsJson.phoneNumber,
+      orderStatus: prefsJson.orderStatus,
+      passwordChanges: prefsJson.passwordChanges,
+      specialOffers: prefsJson.specialOffers,
+      newsletter: prefsJson.newsletter,
+    });
+  }
+
+  useEffect(() => {
+    const loadData = async () => {
+      // Get Data from async storage.
+      try {
+        const prefs = await AsyncStorage.getItem("@prefs");
+        console.log(prefs);
+
+        if (prefs === null) return;
+        const prefsJson = JSON.parse(prefs);
+        setPrefs(prefsJson);
+        asignDefaulValues(prefsJson);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadData();
+  }, []);
   return (
     <View style={styles.container}>
       <Header showBackButton navigation={navigation} />
@@ -46,19 +94,38 @@ export default function Profile({ navigation }: any) {
             </TouchableOpacity>
           </View>
           <Text style={styles.textLabel}>First name</Text>
-          <TextInput style={styles.textInput} />
+          <TextInput
+            placeholder="Kevin"
+            value={state.name}
+            style={styles.textInput}
+          />
           <Text style={styles.textLabel}>Last name</Text>
-          <TextInput style={styles.textInput} />
+          <TextInput
+            placeholder="Garcia"
+            value={state.lastName}
+            style={styles.textInput}
+          />
           <Text style={styles.textLabel}>Email</Text>
-          <TextInput style={styles.textInput} />
+          <TextInput
+            placeholder="kegadev@littlelemon.com"
+            value={state.email}
+            style={styles.textInput}
+          />
           <Text style={styles.textLabel}>Phone number</Text>
-          <TextInput style={styles.textInput} />
+          <TextInput
+            placeholder="123 456 7890"
+            value={state.phoneNumber}
+            style={styles.textInput}
+          />
           <Spacer factor={0.4} />
           <Text style={styles.textCategory}>Email notifications</Text>
           <Spacer factor={0.2} />
           <View style={styles.checkBoxContainer}>
             <Checkbox
-              value={true}
+              value={state.orderStatus}
+              onValueChange={(value) =>
+                setState({ ...state, orderStatus: value })
+              }
               color={APP_COLORS.primary_green}
               style={styles.checkBox}
             />
@@ -66,7 +133,10 @@ export default function Profile({ navigation }: any) {
           </View>
           <View style={styles.checkBoxContainer}>
             <Checkbox
-              value={true}
+              value={state.passwordChanges}
+              onValueChange={(value) =>
+                setState({ ...state, passwordChanges: value })
+              }
               color={APP_COLORS.primary_green}
               style={styles.checkBox}
             />
@@ -74,7 +144,10 @@ export default function Profile({ navigation }: any) {
           </View>
           <View style={styles.checkBoxContainer}>
             <Checkbox
-              value={true}
+              value={state.specialOffers}
+              onValueChange={(value) =>
+                setState({ ...state, specialOffers: value })
+              }
               color={APP_COLORS.primary_green}
               style={styles.checkBox}
             />
@@ -82,7 +155,10 @@ export default function Profile({ navigation }: any) {
           </View>
           <View style={styles.checkBoxContainer}>
             <Checkbox
-              value={true}
+              value={state.newsletter}
+              onValueChange={(value) =>
+                setState({ ...state, newsletter: value })
+              }
               color={APP_COLORS.primary_green}
               style={styles.checkBox}
             />
@@ -92,6 +168,7 @@ export default function Profile({ navigation }: any) {
           <Spacer factor={0.5} />
           <View style={styles.buttonBottomContainer}>
             <TouchableOpacity
+              onPress={() => asignDefaulValues(prefs)}
               style={[
                 styles.button,
                 { borderWidth: 2, borderColor: APP_COLORS.primary_green },
