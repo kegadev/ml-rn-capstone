@@ -61,6 +61,28 @@ const Banner = () => {
   );
 };
 
+const Filter = () => {
+  return (
+    <View style={styles.filterContainer}>
+      <Text style={styles.filterTitle}>ORDER FOR DELIVERY!</Text>
+      <View style={styles.filterButtonsContainer}>
+        <TouchableOpacity style={styles.filterButton}>
+          <Text style={styles.filterButtonText}>Starters</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.filterButton}>
+          <Text style={styles.filterButtonText}>Mains</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.filterButton}>
+          <Text style={styles.filterButtonText}>Desserts</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.filterButton}>
+          <Text style={styles.filterButtonText}>Drinks</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
 type MenuItemType = {
   name: string;
   price: number;
@@ -200,6 +222,7 @@ const Home = ({ navigation }: any) => {
       />
       <ScrollView keyboardDismissMode="on-drag" style={styles.scrollView}>
         <Banner />
+        <Filter />
         <FlatList
           data={menu}
           renderItem={({ item }: { item: MenuItemType }) => renderItem(item)}
@@ -276,6 +299,38 @@ const styles = StyleSheet.create({
   searchBar: {
     paddingTop: 16,
   },
+  filterContainer: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    backgroundColor: APP_COLORS.primary_yellow_transparent,
+  },
+  filterButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  filterTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    // fontFamily: "Karla",
+    color: APP_COLORS.highlight_dark,
+    marginBottom: 10,
+  },
+  filterButton: {
+    height: 40,
+    width: 80,
+    padding: 8,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: APP_COLORS.highlight_light,
+  },
+  filterButtonText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: APP_COLORS.primary_green,
+    // fontFamily: "karla",
+  },
+
   itemContainer: {
     paddingHorizontal: 24,
     paddingVertical: 16,
