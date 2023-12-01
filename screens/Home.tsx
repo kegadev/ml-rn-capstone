@@ -19,6 +19,16 @@ import { APP_COLORS } from "../constants/colors";
 import { APP_STYLES } from "../styles/appStyles";
 import { Spacer } from "../components/GeneralComponents";
 import { MenuItemType } from "../types/types";
+import {
+  createTable,
+  getMenuItems,
+  saveMenuItems,
+  truncateTable,
+} from "../data/database";
+
+import * as SQLite from "expo-sqlite";
+
+const db = SQLite.openDatabase("little_lemon");
 
 const BannerImage = () => {
   return (
@@ -62,28 +72,6 @@ const Banner = () => {
   );
 };
 
-const Filter = () => {
-  return (
-    <View style={styles.filterContainer}>
-      <Text style={styles.filterTitle}>ORDER FOR DELIVERY!</Text>
-      <View style={styles.filterButtonsContainer}>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterButtonText}>Starters</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterButtonText}>Mains</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterButtonText}>Desserts</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterButtonText}>Drinks</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
-
 // const MenuItem = (item: any) => {
 const MenuItem = (item: MenuItemType) => {
   console.log(item);
@@ -93,7 +81,10 @@ const MenuItem = (item: MenuItemType) => {
     <View>
       <View style={styles.itemContainer}>
         <View style={styles.itemDescriptionContainer}>
-          <Text style={styles.itemName}>{item.name}</Text>
+          <Text style={styles.itemName}>
+            {item.name}{" "}
+            <Text style={styles.itemCategory}> - {item.category} -</Text>
+          </Text>
           <Spacer factor={0.1} />
           <Text style={styles.itemDescription}>{item.description}</Text>
           <Spacer factor={0.2} />
@@ -129,6 +120,27 @@ const Home = ({ navigation }: any) => {
   // const [menu, setMenu] = useState([]:MenuItemType);
   const [menu, setMenu] = useState<MenuItemType[]>([]);
 
+  // TODO: filter here
+  const [categories, setCategories] = useState({
+    starters: false,
+    mains: false,
+    desserts: false,
+    drinks: false,
+  });
+
+  const getCategories = () => {
+    return Object.keys(categories).filter(
+      (key) => categories[key as keyof typeof categories] === true
+    );
+  };
+
+  const onCategoryPress = (category: string) => {
+    const value = categories[category as keyof typeof categories];
+    setCategories({ ...categories, [category]: !value });
+    const selectedCategories = getCategories();
+    console.log(selectedCategories);
+  };
+
   function asignDefaulValues(prefsJson: any = {}) {
     setState({
       ...state,
@@ -145,35 +157,105 @@ const Home = ({ navigation }: any) => {
     });
   }
 
+  const Filter = () => {
+    return (
+      <View style={styles.filterContainer}>
+        <Text style={styles.filterTitle}>ORDER FOR DELIVERY!</Text>
+        <View style={styles.filterButtonsContainer}>
+          <TouchableOpacity
+            onPress={() => onCategoryPress("starters")}
+            style={[
+              styles.filterButton,
+              categories.starters
+                ? styles.filterButtonSelected
+                : styles.filterButtonUnSelected,
+            ]}
+          >
+            <Text style={styles.filterButtonText}>Starters</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => onCategoryPress("mains")}
+            style={[
+              styles.filterButton,
+              categories.mains
+                ? styles.filterButtonSelected
+                : styles.filterButtonUnSelected,
+            ]}
+          >
+            <Text style={styles.filterButtonText}>Mains</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => onCategoryPress("desserts")}
+            style={[
+              styles.filterButton,
+              categories.desserts
+                ? styles.filterButtonSelected
+                : styles.filterButtonUnSelected,
+            ]}
+          >
+            <Text style={styles.filterButtonText}>Desserts</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => onCategoryPress("drinks")}
+            style={[
+              styles.filterButton,
+              categories.drinks
+                ? styles.filterButtonSelected
+                : styles.filterButtonUnSelected,
+            ]}
+          >
+            <Text style={styles.filterButtonText}>Drinks</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  const loadMenuFromWeb = async () => {
+    // console.log("GONNA LOAD MENU FROM WEB");
+    const request = await fetch(
+      "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json"
+    );
+    const menuJson = await request.json();
+    // console.log(menuJson.menu);
+    const menuWithImage = menuJson.menu.map((item: MenuItemType) => {
+      return {
+        ...item,
+        image: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
+      };
+    });
+    setMenu(menuWithImage);
+    await saveMenuItems(menuWithImage);
+  };
+
   useEffect(() => {
+    // truncateTable();
+    // return;
     try {
-      const loadMenu = async () => {
-        const request = await fetch(
-          "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json"
-        );
-        const menuJson = await request.json();
-        console.log(menuJson.menu);
-        const menuWithImage = menuJson.menu.map((item: MenuItemType) => {
-          return {
-            ...item,
-            image: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
-          };
-        });
-        // const menuWithImage = menuJson.map((item: any) => {
-        //   return {
-        //     ...item,
-        //     image: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
-        //   };
-        // });
-        // console.log(menuWithImage);
-        menuWithImage.forEach((element: MenuItemType) => {
-          console.log(element.name);
-        });
-        setMenu(menuWithImage);
+      const loadMenuFromDB = async () => {
+        // console.log("GONNA LOAD MENU FROM DB");
+        await createTable();
+        // console.log(request1);
+        // console.log("After create table");
+        const menuItems = await getMenuItems();
+        console.log(menuItems);
+
+        if (Array.isArray(menuItems) && menuItems.length > 0) {
+          // setMenu(menuItems);
+          // console.log("MENU FROM DB ::::: ");
+          // console.log(menuItems);
+
+          setMenu(menuItems as MenuItemType[]);
+        } else {
+          // console.log("noting in menuItems");
+          await loadMenuFromWeb();
+        }
       };
 
-      loadMenu();
-    } catch (error) {}
+      loadMenuFromDB();
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
 
   useFocusEffect(
@@ -197,7 +279,7 @@ const Home = ({ navigation }: any) => {
 
   // const renderItem = ({ item }: any) => {
   const renderItem = (item: MenuItemType) => {
-    console.log("actual item::::: " + item);
+    // console.log("actual item::::: " + item);
     return MenuItem(item);
   };
 
@@ -217,6 +299,7 @@ const Home = ({ navigation }: any) => {
         <Banner />
         <Filter />
         <FlatList
+          scrollEnabled={false}
           keyExtractor={(item) => item.name + item.price}
           data={menu}
           renderItem={({ item }: { item: MenuItemType }) => renderItem(item)}
@@ -316,7 +399,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+  },
+  filterButtonSelected: {
     backgroundColor: APP_COLORS.primary_green,
+  },
+  filterButtonUnSelected: {
+    backgroundColor: APP_COLORS.primary_green_transparent,
   },
   filterButtonText: {
     fontSize: 14,
@@ -347,11 +435,18 @@ const styles = StyleSheet.create({
     fontFamily: "Markazi",
     color: APP_COLORS.primary_green,
   },
+  itemCategory: {
+    fontSize: 12,
+    fontWeight: "bold",
+    fontFamily: "Karla",
+    textAlign: "right",
+    alignContent: "center",
+    color: APP_COLORS.primary_green_transparent,
+  },
   itemPrice: {
     fontSize: 18,
     fontWeight: "600",
     fontFamily: "Karla",
-    topmargin: 10,
     color: APP_COLORS.highlight_dark,
   },
   itemDescription: {

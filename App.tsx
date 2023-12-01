@@ -34,7 +34,7 @@ export default function App() {
       // Get Data from async storage.
       try {
         const prefs = await AsyncStorage.getItem("@prefs");
-        console.log(prefs);
+        // console.log(prefs);
         let isOnBoarding = false;
 
         if (prefs != null) {
